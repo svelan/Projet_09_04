@@ -5,7 +5,7 @@ using namespace std;
 
 //prototypes de fonctions
 void Vecteur2D::affiche(ostream& sortie) const{
-    sortie<<"("<<x<<", "<<y<<")";
+    sortie<<x<<" "<<y<<" ";
 }
 
 void Vecteur2D::set_coord(double x1, double y1){

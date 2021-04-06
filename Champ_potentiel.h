@@ -27,13 +27,16 @@ public:
 
     ChampPotentiels(int Nx=0,int Ny=0, int Nz=0, double lambda=0.0)
             :Nx(Nx),Ny(Ny),Nz(Nz),lambda(lambda),collection3D(Nx, std::vector<std::vector<Potentiel>>(Ny, std::vector<Potentiel>(Nz))){
-
+    set_xyz();
     }
 
 
-    void initialise(double v_inf, Montagne const& everest);
+    void initialise(double const& v_inf, Montagne const& everest);
+    void calcule_laplaciens();
     void set_xyz();
     void set_value_x(double x, int i);
     void set_value_y(double y, int j);
     void set_value_z(double z, int k);
+    void set_lambda(double x);
+    void affichage();
 };
