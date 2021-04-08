@@ -22,6 +22,7 @@ private:
     unsigned int Nz;
     double lambda;
     std::vector<double> X,Y,Z;
+    static double epsilon;
 public:
     //La taille du tableau a été initialisé et c'est constructeur par défaut et par valeur;
 
@@ -34,9 +35,19 @@ public:
     void initialise(double const& v_inf, Montagne const& everest);
     void calcule_laplaciens();
     void set_xyz();
-    void set_value_x(double x, int i);
-    void set_value_y(double y, int j);
-    void set_value_z(double z, int k);
-    void set_lambda(double x);
     void affichage();
+    void lapla_affichage();
+
+
+    // méthode erreur() qui renvoie la somme des carrés des normes des vecteurs laplacien ;
+    double erreur();
+    //une méthode iteration() qui applique l'équation (6) du complément mathématique en tout point
+    void iteration();
+    //une méthode resolution() qui répète l'itération précédente tant que l'erreur est plus grande qu'un seuil donné et le nombre d'itérations plus petit qu'un maximum donné.
+    void resolution(double seuil, unsigned int max_iterations, bool verbeuse);
+    //une méthode vitesse() qui prend trois paramètres i, j et k et retourne un tableau de trois double qui sont les coordonnées de la vitesse du vent en (xi, yj, zk)
+    std::vector<double> vitesse(unsigned int i, unsigned int j, unsigned int k);
+
+    void affiche_total();
+
 };

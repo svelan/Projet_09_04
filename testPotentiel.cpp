@@ -9,10 +9,15 @@ using namespace std;
 int main() {
     Montagne Himalaya(3, 3, 0.4, 3, 3);
     ChampPotentiels CP(30,30,30,0.69);
-    CP.set_xyz();
     CP.initialise(15,Himalaya);
-    CP.calcule_laplaciens();
-    CP.affichage();
-
+    //CP.calcule_laplaciens();
+    //CP.affichage();
+    //CP.lapla_affichage();
+    Montagne m(15, 15, 15, 5, 5);
+    ChampPotentiels champ(30,30,30,0.69);
+    champ.initialise(15,m);
+    champ.calcule_laplaciens();
+    //champ.resolution(2.2621843e-5,2000,false);
+    champ.affiche_total();
     return 0;
 }
