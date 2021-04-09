@@ -30,7 +30,7 @@ void ChampPotentiels:: set_xyz(){
         X.push_back(i*lambda);
     }
     for(double j(0); j < Ny; ++j){
-        Y.push_back(j*lambda - (lambda*(Ny-1))/2);
+        Y.push_back(j*lambda - (lambda*(Ny-1)/2));
     }
     for(double k(0); k < Nz; ++k){
         Z.push_back(k*lambda);
@@ -40,16 +40,16 @@ void ChampPotentiels:: set_xyz(){
 }
 
 // méthode initialisant le potentiel vecteur en tout point (xi,yj,zk) -- fonctionne
+//les valeurs affichées sont correctes !
 void ChampPotentiels:: initialise(double const& v_infini, Montagne const& M) {
     //initialisation du potentiel vecteur en tout point et du laplacien à (0,0)
     for (int i(0); i < Nx; ++i){
         for (int j(0); j < Ny; ++j){
             for (int k(0); k < Nz; ++k){
-                collection3D[i][j][k].set_potentiel((-v_infini/2) * Z[k],(-v_infini/2) * Y[j]);
+                collection3D[i][j][k].set_potentiel((-v_infini/2)*Z[k],Y[j]*(v_infini/2));
                 collection3D[i][j][k].set_laplacien(0,0);
-                if((Z[k] <= M.altitude(X[i], Y[j]) and (i != 0) and (i != Nx - 1) and (j != 0) and (Ny - 1 != j))){
+                if((Z[k] <= M.altitude(X[i], Y[j])) and (i != 0) and (i != Nx - 1) and (j != 0) and (Ny - 1 != j)){
                     collection3D[i][j][k].set_potentiel(0,0);
-
                 }
             }
         }
@@ -60,20 +60,21 @@ void ChampPotentiels:: initialise(double const& v_infini, Montagne const& M) {
 
 
 
-void ChampPotentiels:: calcule_laplaciens(){ // fonctionne :)
+void ChampPotentiels:: calcule_laplaciens(){//n'affiche pas les bonnes valeurs
+  Vecteur2D v(0,0);
+
     for (int i(1); i < Nx-1; ++i){
         for (int j(1); j < Ny-1; ++j){
             for (int k(1); k < Nz-1; ++k){
-                collection3D[i][j][k].set_laplacien((collection3D[i-1][j][k].get_potentiel()
-                                                     + collection3D[i][j-1][k].get_potentiel()+ collection3D[i][j][k-1].get_potentiel()
-                                                     - (6 * collection3D[i][j][k].get_potentiel()) + collection3D[i+1][j][k].get_potentiel()
-                                                     + collection3D[i][j+1][k].get_potentiel() + collection3D[i][j][k+1].get_potentiel()).get_x(),
-                                                    (collection3D[i-1][j][k].get_potentiel()
-                                                     + collection3D[i][j-1][k].get_potentiel()
-                                                     + collection3D[i][j][k-1].get_potentiel() - (6 * collection3D[i][j][k].get_potentiel())
-                                                     + collection3D[i+1][j][k].get_potentiel() + collection3D[i][j+1][k].get_potentiel()
-                                                     + collection3D[i][j][k+1].get_potentiel()).get_y());
-               // cout << i <<" "<< j <<" "<< k <<": "<< collection3D[i][j][k].get_laplacien() << endl;
+            v=(collection3D[i-1][j][k].get_potentiel()
+               + collection3D[i][j-1][k].get_potentiel()
+               + collection3D[i][j][k-1].get_potentiel() - (6 * collection3D[i][j][k].get_potentiel())
+               + collection3D[i+1][j][k].get_potentiel() + collection3D[i][j+1][k].get_potentiel()
+               + collection3D[i][j][k+1].get_potentiel());
+
+                collection3D[i][j][k].set_laplacien(v.get_x(),v.get_y());
+
+                cout << i <<" "<< j <<" "<< k <<": "<< collection3D[i][j][k].get_laplacien() << endl;
                 // j'affiche pour savoir jusqu'où va la boucle, pour l'instant:
                 // max i =1 max j= 28 et max k = 29(normal puisque Nz = 30)
 
@@ -86,7 +87,7 @@ void ChampPotentiels:: calcule_laplaciens(){ // fonctionne :)
 }
 
 // méthode affichage des vecteurs potentiels et des laplaciens
-void ChampPotentiels:: affichage(){// fonctionne par contre ça ne correspond pas à leur affichage
+void ChampPotentiels:: affichage(){// ceci fonctionne !! mais gnuplot n'affiche rien !
     for (int i(0); i < Nx; ++i){
         for (int j(0); j < Ny; ++j){
             for (int k(0); k < Nz; ++k){
@@ -111,7 +112,7 @@ void ChampPotentiels::lapla_affichage() {
 
 // méthode erreur() qui renvoie la somme des carrés des normes de tous les vecteurs laplacien ;
 double ChampPotentiels:: erreur(){
-    double retour;
+    double retour(0.0);
     for (int i(1); i < Nx; ++i){
         for (int j(1); j < Ny; ++j){
             for (int k(1); k < Nz; ++k){
@@ -123,19 +124,16 @@ double ChampPotentiels:: erreur(){
 }
 
 // une méthode iteration() qui applique l'équation (6) du complément mathématique en tout point (u représente le potentiel vecteur)
-void ChampPotentiels:: iteration(){
-
-    for (int i = 1; i < Nx-1; ++i) {
-        for (int j = 1; j < Ny-1; ++j) {
-            for (int k = 1; k < Nz-1; ++k) {
-                collection3D[i][j][k].set_laplacien((collection3D[i][j][k].get_potentiel()+epsilon*(collection3D[i-1][j][k].get_potentiel()
-                                                                                                   + collection3D[i][j-1][k].get_potentiel()+ collection3D[i][j][k-1].get_potentiel()
-                                                                                                   - (6 * collection3D[i][j][k].get_potentiel()) + collection3D[i+1][j][k].get_potentiel()
-                                                                                                   + collection3D[i][j+1][k].get_potentiel() + collection3D[i][j][k+1].get_potentiel())).get_x(),
-                                                    (collection3D[i][j][k].get_potentiel().get_x()+epsilon*(collection3D[i-1][j][k].get_potentiel()
-                         + collection3D[i][j-1][k].get_potentiel()+ collection3D[i][j][k-1].get_potentiel()
-                         - (6 * collection3D[i][j][k].get_potentiel()) + collection3D[i+1][j][k].get_potentiel()
-                         + collection3D[i][j+1][k].get_potentiel() + collection3D[i][j][k+1].get_potentiel()).get_y()));
+void ChampPotentiels:: iteration() {
+    //car à chaque fois, le vecteur laplacien change -> car le potentiel change;
+    calcule_laplaciens();
+    Vecteur2D u(0, 0);
+    for (int i = 1; i < Nx - 1; ++i) {
+        for (int j = 1; j < Ny - 1; ++j) {
+            for (int k = 1; k < Nz - 1; ++k) {
+                u = collection3D[i][j][k].get_potentiel() + epsilon * collection3D[i][j][k].get_laplacien();
+               //ici j'ai juste modifié que c'est un set_potentiel et non un set_laplacien
+               collection3D[i][j][k].set_potentiel(u.get_x(), u.get_y());
             }
         }
     }
@@ -150,7 +148,7 @@ void ChampPotentiels:: resolution(double seuil, unsigned int max_iterations, boo
 cout<<1<<" "<<erreur()<<endl;
     while((erreur()>seuil)&&(max<=max_iterations)){
     iteration();
-    if(verbeuse) {affichage(); lapla_affichage();}
+    if (verbeuse) affichage(); lapla_affichage();
     max+=1;
     cout<<max+1<<" "<<erreur()<<endl;
 }
@@ -160,36 +158,49 @@ cout<<1<<" "<<erreur()<<endl;
 vector<double> ChampPotentiels:: vitesse(unsigned int i, unsigned int j, unsigned int k){
     // attention aux conditions aux bords
     double v_infini;
-    vector<double> vitesse;
+    vector<double> vitesse(3);
     // A_3,i,j,k= v_infini/2 * Y[j] et A_2,i,j,k= -v_infini/2 * Z[k] => conditions aux bords mais au bord on force a v_infini donc:
     double ui(v_infini), uj(v_infini), uk(v_infini); // par defaut on met les valeurs du bord
+    if((i==0)or(j==0)or(k==0)or(i==29)or(j==29)or(k==29)){
+        vitesse[0]=0;
+        vitesse[1]=0;
+        vitesse[2]=0;
+    }else{
+
     // si pas au bord alors:
     // par l'équation 7 du complément mathématique on a :
     //ui = 1/(2*lambda)*(A_3,i,j+1,k − A3_i,j−1,k − A2_i,j,k+1 + A2_i,j,k−1)
     //uj = 1/(2*lambda)*(−A3_i+1,j,k + A3_i−1,j,k)
     //uk = 1/(2*lambda)*(A2_i+1,j,k − A2_i−1,j,k)
-    ui = 1/(2*lambda)*(collection3D[i][j+1][k].get_potentiel().get_y()
+    ui = (1/(2*lambda))*(collection3D[i][j+1][k].get_potentiel().get_y()
     -collection3D[i][j-1][k].get_potentiel().get_y()
     -collection3D[i][j][k+1].get_potentiel().get_x()
     -collection3D[i][j][k-1].get_potentiel().get_x());
 
-    uj = 1/(2*lambda)*(-collection3D[i+1][j][k].get_potentiel().get_y()+collection3D[i-1][j][k].get_potentiel().get_y());
-    uk = 1/(2*lambda)*(-collection3D[i+1][j][k].get_potentiel().get_x()+collection3D[i-1][j][k].get_potentiel().get_x());
-    vitesse.push_back(ui);
-    vitesse.push_back(uj);
-    vitesse.push_back(uk);
+    uj = (1/(2*lambda))*(-collection3D[i+1][j][k].get_potentiel().get_y()+collection3D[i-1][j][k].get_potentiel().get_y());
+    uk = (1/(2*lambda))*(-collection3D[i+1][j][k].get_potentiel().get_x()+collection3D[i-1][j][k].get_potentiel().get_x());
+    vitesse[0]=ui;
+    vitesse[1]=uj;
+    vitesse[2]=uk;
+    }
+
     return vitesse;
+}
+
+double ChampPotentiels::norme3D_2(vector<double> test){
+    return test[0]*test[0]+test[1]*test[1]+test[2]*test[2];
 }
 
 void ChampPotentiels::affiche_total() {
     //PAS LES BONNES RéPONSES POUR UNE QUELCONQUE RAISON ?!?!
+
     for (int i = 1; i < Nx-1; ++i) {
         for (int j = 1; j < Ny-1; ++j) {
             for (int k = 1; k < Nz-1; ++k) {
-             cout<<i<<" "<<j<<" "<<k<<" "<<collection3D[i][j][k].get_potentiel().get_x()<<" "
-             <<collection3D[i][j][k].get_potentiel().get_y()<<" "<<vitesse(i,j,k)[0]<<" "
-             <<vitesse(i,j,k)[1]<<" "<<vitesse(i,j,k)[2]<<" "
-             <<vitesse(i,j,k)[0]*vitesse(i,j,k)[0]+vitesse(i,j,k)[1]*vitesse(i,j,k)[1]+vitesse(i,j,k)[2]*vitesse(i,j,k)[2]<<endl;
+                cout<<i<<" "<<j<<" "<<k<<" "<<collection3D[i][j][k].get_potentiel().get_x()<<" "
+                    <<collection3D[i][j][k].get_potentiel().get_y()<<" "<<vitesse(i,j,k)[0]<<" "
+                    <<vitesse(i,j,k)[1]<<" "<<vitesse(i,j,k)[2]<<" "
+                    <<norme3D_2(vitesse(i,j,k))<<endl;
             }
         }
     }

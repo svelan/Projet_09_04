@@ -24,18 +24,18 @@ private:
     std::vector<double> X,Y,Z;
     static double epsilon;
 public:
-    //La taille du tableau a été initialisé et c'est constructeur par défaut et par valeur;
+    //La taille du tableau a été initialisé et c'est constructeur par défaut et par valeur, et on appelle la fonction set_xyz() qui initialise X,Y,Z
+    // les vecteur positions des données en X,Y et en Z;
 
     ChampPotentiels(int Nx=0,int Ny=0, int Nz=0, double lambda=0.0)
-            :Nx(Nx),Ny(Ny),Nz(Nz),lambda(lambda),collection3D(Nx, std::vector<std::vector<Potentiel>>(Ny, std::vector<Potentiel>(Nz))){
-    set_xyz();
-    }
-
+            :Nx(Nx),Ny(Ny),Nz(Nz),lambda(lambda),collection3D(Nx, std::vector<std::vector<Potentiel>>(Ny, std::vector<Potentiel>(Nz))){ set_xyz();}
 
     void initialise(double const& v_inf, Montagne const& everest);
     void calcule_laplaciens();
     void set_xyz();
+    //affiche le vecteur potentiel;
     void affichage();
+    //affiche le vecteur laplacien;
     void lapla_affichage();
 
 
@@ -48,6 +48,9 @@ public:
     //une méthode vitesse() qui prend trois paramètres i, j et k et retourne un tableau de trois double qui sont les coordonnées de la vitesse du vent en (xi, yj, zk)
     std::vector<double> vitesse(unsigned int i, unsigned int j, unsigned int k);
 
+    //la fonction qui calcule la norme d'un tableau (un vecteur 3D);
+    double norme3D_2(std::vector<double> test);
+    //La fonction qui affiche le tout (Tests point après P7.3);
     void affiche_total();
 
 };
