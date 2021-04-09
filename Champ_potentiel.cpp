@@ -3,7 +3,7 @@
 #include "Montagne.h"
 #include <vector>
 using namespace std;
-
+//MODIF
 double ChampPotentiels::epsilon(0.1);
 
 Vecteur2D Potentiel::get_potentiel() const {
@@ -110,7 +110,7 @@ void ChampPotentiels::lapla_affichage() {
 }
 
 
-// méthode erreur() qui renvoie la somme des carrés des normes de tous les vecteurs laplacien ;
+// méthode erreur() qui renvoie la somme des carrés des normes de tous les vecteurs laplacien ;
 double ChampPotentiels:: erreur(){
     double retour(0.0);
     for (int i(1); i < Nx; ++i){
@@ -123,7 +123,7 @@ double ChampPotentiels:: erreur(){
     return retour;
 }
 
-// une méthode iteration() qui applique l'équation (6) du complément mathématique en tout point (u représente le potentiel vecteur)
+// une méthode iteration() qui applique l'équation (6) du complément mathématique en tout point (u représente le potentiel vecteur)
 void ChampPotentiels:: iteration() {
     //car à chaque fois, le vecteur laplacien change -> car le potentiel change;
     calcule_laplaciens();
@@ -138,7 +138,7 @@ void ChampPotentiels:: iteration() {
         }
     }
 }
-//une méthode resolution() qui répète l'itération précédente tant que l'erreur est plus grande qu'un seuil donné et le nombre d'itérations plus petit qu'un maximum donné.
+//une méthode resolution() qui répète l'itération précédente tant que l'erreur est plus grande qu'un seuil donné et le nombre d'itérations plus petit qu'un maximum donné.
 void ChampPotentiels:: resolution(double seuil, unsigned int max_iterations, bool verbeuse){
 //SHRI: l'affichage fait quelque chose de bizarre, il modifie les données au premier pas
     // et ne les modifie plus après, donc fait les 2000 iterations, il y a un problème avec
@@ -154,7 +154,7 @@ cout<<1<<" "<<erreur()<<endl;
 }
 
 }
-//une méthode vitesse() qui prend trois paramètres i, j et k et retourne un tableau de trois double qui sont les coordonnées de la vitesse du vent en (xi, yj, zk)
+//une méthode vitesse() qui prend trois paramètres i, j et k et retourne un tableau de trois double qui sont les coordonnées de la vitesse du vent en (xi, yj, zk)
 vector<double> ChampPotentiels:: vitesse(unsigned int i, unsigned int j, unsigned int k){
     // attention aux conditions aux bords
     double v_infini;
