@@ -5,7 +5,7 @@
 using namespace std;
 //MODIF
 double ChampPotentiels::epsilon(0.1);
-
+//YOUHOU
 Vecteur2D Potentiel::get_potentiel() const {
     return potentiel;
 }
